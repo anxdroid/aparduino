@@ -13,7 +13,8 @@
 EnergyMonitor ct1,ct2,ct3, ct4;
 
 // On-board emonTx LED
-const int LEDpin = 9;                                                    
+const int LED1 = 1;                                                    
+const int LED0 = 0;                                                    
 
 void setup() 
 {
@@ -37,8 +38,8 @@ void setup()
   //ct4.voltage(0, 300.6, 1.7);
   
   // Setup indicator LED
-  pinMode(LEDpin, OUTPUT);                                              
-  digitalWrite(LEDpin, HIGH);                                                                                  
+  //pinMode(LED1, OUTPUT);
+  //pinMode(LED0, OUTPUT);                                                        
 }
 
 void loop() 
@@ -48,22 +49,50 @@ void loop()
   //ct2.calcVI(20,2000);
   ct3.calcVI(20,2000);
   //ct4.calcVI(20,2000);
-    
+  unsigned long time = millis();  
   // Print power 
   //Serial.print(ct1.realPower);     
   //Serial.print(" "); 
   //Serial.print(ct2.realPower);
   //Serial.print(" "); 
-  Serial.print(ct3.realPower);
+  Serial.print("MILLIS:");
+  Serial.print(time);
+  Serial.print(":msec");
+
   Serial.print(" ");
+
+  Serial.print("POWER_SOLAR:");
+  Serial.print(ct3.realPower);
+  Serial.print(":KW");
+  
+  Serial.print(" ");
+
+  Serial.print("CURRENT_SOLAR:");
   Serial.print(ct3.Irms);
+  Serial.print(":A");
+  
   Serial.print(" "); 
   //Serial.print(ct4.realPower);
-  //Serial.print(" "); 
-  Serial.println(ct3.Vrms);
-  //Serial.println();
+  //Serial.print(" ");
+
+  Serial.print("VOLTAGE:");
+  Serial.print(ct3.Vrms);
+  Serial.print(":V");
+
+  Serial.println();
+  
     
   // Available properties: ct1.realPower, ct1.apparentPower, ct1.powerFactor, ct1.Irms and ct1.Vrms
 
+  /*
+  digitalWrite(LED0, HIGH);
+  delay(100);
+  digitalWrite(LED1, HIGH);
   delay(1000);
+  digitalWrite(LED0, LOW);
+  delay(100);
+  digitalWrite(LED1, LOW);
+  */
+  
+  delay(5000);
 }
