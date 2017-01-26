@@ -10,6 +10,7 @@ float minVal[CYCLES];
 void setup()
 {
   Serial.begin(9600);
+  pinMode(currentPin, INPUT)
 }
 
 void loop()

@@ -63,7 +63,7 @@ void loop()
 
   Serial.print("POWER_SOLAR:");
   Serial.print(ct3.realPower);
-  Serial.print(":KW");
+  Serial.print(":W");
   
   Serial.print(" ");
 
