@@ -8,13 +8,28 @@
 */
 
 #include "EmonLib.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 // Create  instances for each CT channel
 EnergyMonitor ct1,ct2,ct3, ct4;
 
 // On-board emonTx LED
 const int LED1 = 1;                                                    
-const int LED0 = 0;                                                    
+const int LED0 = 0;
+
+                                                    // Data wire is plugged into port 2 on the Arduino
+#define ONE_WIRE_BUS 4
+#define TEMPERATURE_PRECISION 12
+
+// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
+OneWire oneWire(ONE_WIRE_BUS);
+
+// Pass our oneWire reference to Dallas Temperature. 
+DallasTemperature sensors(&oneWire);
+
+//DeviceAddress address_T1 = { 0x28, 0x22, 0x70, 0xEE, 0x02, 0x00, 0x00, 0xB8 };
+DeviceAddress address_T1 = { 0x28, 0xFF, 0x96, 0xAB, 0x74, 0x16, 0x03, 0x8B };
 
 void setup() 
 {
@@ -39,7 +54,25 @@ void setup()
   
   // Setup indicator LED
   //pinMode(LED1, OUTPUT);
-  //pinMode(LED0, OUTPUT);                                                        
+  //pinMode(LED0, OUTPUT); 
+
+  delay(1000);
+  Serial.begin(9600);
+  Serial.println("Temperature search");
+  Serial.println("waiting 6 seconds before printing");
+  delay(6000);
+
+  sensors.begin();
+  
+  DeviceAddress tmp_address;
+  int numberOfDevices = sensors.getDeviceCount();
+  
+  for(int i=0;i<numberOfDevices; i++)
+  {
+    sensors.getAddress(tmp_address, i);
+    printAddress(tmp_address);
+    Serial.println();
+  }
 }
 
 void loop() 
@@ -61,13 +94,13 @@ void loop()
 
   Serial.print(" ");
 
-  Serial.print("POWER_SOLAR:");
+  Serial.print("10:POWER_SOLAR:");
   Serial.print(ct3.realPower);
   Serial.print(":W");
   
   Serial.print(" ");
 
-  Serial.print("CURRENT_SOLAR:");
+  Serial.print("10:CURRENT_SOLAR:");
   Serial.print(ct3.Irms);
   Serial.print(":A");
   
@@ -75,10 +108,18 @@ void loop()
   //Serial.print(ct4.realPower);
   //Serial.print(" ");
 
-  Serial.print("VOLTAGE:");
+  Serial.print("10:VOLTAGE:");
   Serial.print(ct3.Vrms);
   Serial.print(":V");
 
+  Serial.print(" "); 
+
+  Serial.print("10:TEMP_TERRAZZO:");
+  sensors.requestTemperatures();
+  double temperature = sensors.getTempC(address_T1);  // Get the temperature of the sensor
+  Serial.print(temperature); 
+  Serial.print(":&deg;");
+           
   Serial.println();
   
     
@@ -95,4 +136,19 @@ void loop()
   */
   
   delay(5000);
+}
+
+void printAddress(DeviceAddress deviceAddress)
+{
+  Serial.print("{ ");
+  for (uint8_t i = 0; i < 8; i++)
+  {
+    // zero pad the address if necessary
+    Serial.print("0x");
+    if (deviceAddress[i] < 16) Serial.print("0");
+    Serial.print(deviceAddress[i], HEX);
+    if (i<7) Serial.print(", ");
+    
+  }
+  Serial.print(" }");
 }
