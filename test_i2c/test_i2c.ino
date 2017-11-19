@@ -1,7 +1,8 @@
 #include <Wire.h>
 
 #define SLAVE_ADDRESS 0x04
-int number = 0;
+int recvData = 0;
+int sentData = 0;
 int state = 0;
 int buttonState = 0;
 int buttonPin = 2;
@@ -20,7 +21,6 @@ void setup() {
 
   // define callbacks for i2c communication
   Wire.onReceive(receiveData);
-  Wire.onRequest(sendData);
 
   Serial.println("Ready!");
 }
@@ -31,7 +31,12 @@ void loop() {
 
   if (buttonState == HIGH) {
     Serial.println("Button pressed !");
-    toggleRelay();
+    //toggleRelay();
+    sentData = 2;
+    Wire.write(sentData);
+    Serial.print("data sent: ");
+    Serial.println(sentData);
+    delay(100);
   }
 
 }
@@ -54,13 +59,17 @@ void toggleRelay() {
 void receiveData(int byteCount) {
 
   while (Wire.available()) {
-    number = Wire.read();
+    recvData = Wire.read();
     Serial.print("data received: ");
-    Serial.println(number);
+    Serial.println(recvData);
 
-    if (number == 1) {
+    if (recvData == 1) {
       Serial.println("Command request !");
       toggleRelay();
+      sentData = 1;
+      Wire.write(sentData);
+      Serial.print("data sent: ");
+      Serial.println(sentData);
     }
     /*
         if (number == 1) {
@@ -76,9 +85,4 @@ void receiveData(int byteCount) {
         }
     */
   }
-}
-
-// callback for sending data
-void sendData() {
-  Wire.write(number);
 }
