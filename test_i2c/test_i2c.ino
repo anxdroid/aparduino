@@ -1,27 +1,50 @@
 #include <Wire.h>
 
 #define SLAVE_ADDRESS 0x04
+int button1Pin = 12;
+int button2Pin = 11;
+
+int relay1Pin = 3;
+int relay1Status = LOW;
+int relay2Pin = 4;
+int relay2Status = LOW;
+
+int led1Pin = 8;
+int led2Pin = 9;
+
 int recvData = 0;
 int sentData = 0;
-int state = 0;
-int buttonState = 0;
-int buttonPin = 2;
-int relay1Pin = 3;
-int relay1Status = 0;
-int relay2Pin = 4;
 
-void toggleRelay() {
-  if (relay1Status == 0) {
-    digitalWrite(relay1Pin, HIGH);
-    Serial.println("ON");
-    relay1Status = 1;
-    delay(100);
-  } else {
-    digitalWrite(relay1Pin, LOW);
-    Serial.println("OFF");
-    relay1Status = 0;
-    delay(100);
+void toggleStatus(int nRelay, int val) {
+  int relayPin = relay1Pin;
+  int relayStatus = relay1Status;
+  int ledPin = led1Pin;
+  if (nRelay == 2) {
+    relayPin = relay2Pin;
+    relayStatus = relay2Status;
+    ledPin = led2Pin;
   }
+  if (val == HIGH) {
+    if (relayStatus == HIGH) {
+      relayStatus = LOW;
+    } else {
+      relayStatus = HIGH;
+    }
+    Serial.print("Button ");
+    Serial.print(nRelay);
+    Serial.print(" pressed status ");
+    Serial.println(relayStatus);
+    digitalWrite(relayPin, relayStatus);
+    digitalWrite(ledPin, relayStatus);
+
+    if (nRelay == 1) {
+      relay1Status = relayStatus;
+    }else if (nRelay == 2) {
+      relay2Status = relayStatus;
+    }
+    delay(300);
+  }
+  
 }
 
 // callback for received data
@@ -32,59 +55,40 @@ void receiveData(int byteCount) {
     Serial.print("data received: ");
     Serial.println(recvData);
 
-    if (recvData == 1) {
+    if (recvData > 0 && recvData < 3) {
       Serial.println("Command request !");
-      toggleRelay();
+      toggleStatus(recvData, HIGH);
       sentData = 1;
       Wire.write(sentData);
       Serial.print("data sent: ");
       Serial.println(sentData);
     }
-    /*
-        if (number == 1) {
-
-          if (state == 0) {
-            digitalWrite(13, HIGH); // set the LED on
-            state = 1;
-          }
-          else {
-            digitalWrite(13, LOW); // set the LED off
-            state = 0;
-          }
-        }
-    */
   }
 }
 
 void setup() {
-  //pinMode(13, OUTPUT);
-  pinMode(buttonPin, INPUT);
+  Serial.begin(9600); // start serial for output
+  Serial.println("Start... ");
+  // put your setup code here, to run once:
+  pinMode(button1Pin, INPUT);
+  pinMode(button2Pin, INPUT);
   pinMode(relay1Pin, OUTPUT);
   pinMode(relay2Pin, OUTPUT);
-  Serial.begin(9600); // start serial for output
-  // initialize i2c as slave
+  pinMode(led1Pin, OUTPUT);
+  pinMode(led2Pin, OUTPUT);
+  
   Wire.begin(SLAVE_ADDRESS);
-
   // define callbacks for i2c communication
   Wire.onReceive(receiveData);
-
   Serial.println("Ready!");
 }
 
 void loop() {
   delay(100);
-  buttonState = digitalRead(buttonPin);
-
-  if (buttonState == HIGH) {
-    Serial.println("Button pressed !");
-    //toggleRelay();
-    sentData = 2;
-    Wire.write(sentData);
-    Serial.print("data sent: ");
-    Serial.println(sentData);
-    delay(100);
-  }
-
+  int val1 = digitalRead(button1Pin);
+  toggleStatus(1, val1);
+  int val2 = digitalRead(button2Pin);
+  toggleStatus(2, val2);
 }
 
 
