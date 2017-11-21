@@ -10,6 +10,38 @@ int relay1Pin = 3;
 int relay1Status = 0;
 int relay2Pin = 4;
 
+// callback for received data
+void receiveData(int byteCount) {
+
+  while (Wire.available()) {
+    recvData = Wire.read();
+    Serial.print("data received: ");
+    Serial.println(recvData);
+
+    if (recvData == 1) {
+      Serial.println("Command request !");
+      toggleRelay();
+      sentData = 1;
+      Wire.write(sentData);
+      Serial.print("data sent: ");
+      Serial.println(sentData);
+    }
+    /*
+        if (number == 1) {
+
+          if (state == 0) {
+            digitalWrite(13, HIGH); // set the LED on
+            state = 1;
+          }
+          else {
+            digitalWrite(13, LOW); // set the LED off
+            state = 0;
+          }
+        }
+    */
+  }
+}
+
 void setup() {
   //pinMode(13, OUTPUT);
   pinMode(buttonPin, INPUT);
@@ -55,34 +87,4 @@ void toggleRelay() {
   }
 }
 
-// callback for received data
-void receiveData(int byteCount) {
 
-  while (Wire.available()) {
-    recvData = Wire.read();
-    Serial.print("data received: ");
-    Serial.println(recvData);
-
-    if (recvData == 1) {
-      Serial.println("Command request !");
-      toggleRelay();
-      sentData = 1;
-      Wire.write(sentData);
-      Serial.print("data sent: ");
-      Serial.println(sentData);
-    }
-    /*
-        if (number == 1) {
-
-          if (state == 0) {
-            digitalWrite(13, HIGH); // set the LED on
-            state = 1;
-          }
-          else {
-            digitalWrite(13, LOW); // set the LED off
-            state = 0;
-          }
-        }
-    */
-  }
-}
