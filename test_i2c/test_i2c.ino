@@ -10,6 +10,20 @@ int relay1Pin = 3;
 int relay1Status = 0;
 int relay2Pin = 4;
 
+void toggleRelay() {
+  if (relay1Status == 0) {
+    digitalWrite(relay1Pin, HIGH);
+    Serial.println("ON");
+    relay1Status = 1;
+    delay(100);
+  } else {
+    digitalWrite(relay1Pin, LOW);
+    Serial.println("OFF");
+    relay1Status = 0;
+    delay(100);
+  }
+}
+
 // callback for received data
 void receiveData(int byteCount) {
 
@@ -39,20 +53,6 @@ void receiveData(int byteCount) {
           }
         }
     */
-  }
-}
-
-void toggleRelay() {
-  if (relay1Status == 0) {
-    digitalWrite(relay1Pin, HIGH);
-    Serial.println("ON");
-    relay1Status = 1;
-    delay(100);
-  } else {
-    digitalWrite(relay1Pin, LOW);
-    Serial.println("OFF");
-    relay1Status = 0;
-    delay(100);
   }
 }
 
