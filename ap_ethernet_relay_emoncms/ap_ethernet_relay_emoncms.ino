@@ -3,17 +3,9 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-// Enter a MAC address for your controller below.
-// Newer Ethernet shields have a MAC address printed on a sticker on the shield
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-// if you don't want to use DNS (and reduce your sketch size)
-// use the numeric IP instead of the name for the server:
-//IPAddress server(79, 22, 220, 117); // numeric IP for Google (no DNS)
 IPAddress server(192, 168, 1, 12);
-IPAddress serverCmd(192, 168, 1, 3);// numeric IP for Google (no DNS)
-//char server[] = "http://192.168.1.3:80/temp/jobs.php";    // name address for Google (using DNS)
-
-// Set the static IP address to use if the DHCP fails to assign
+IPAddress serverCmd(192, 168, 1, 12);// numeric IP for Google (no DNS)
 IPAddress ip(192, 168, 1, 20);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress mydns(192, 168, 1, 1);
@@ -21,9 +13,6 @@ IPAddress subnet(255, 255, 255, 0);
 const char* nodeid = "30";
 const char* apikey = "2a4e7605bb826a82ef3a54f4ff0267ed";
 
-// Initialize the Ethernet client library
-// with the IP address and port of the server
-// that you want to connect to (port 80 is default for HTTP):
 EthernetClient client;
 
 String id = "0";
@@ -36,7 +25,7 @@ String prev_param = "";
 OneWire  ds(6);
 DallasTemperature sensors(&ds);
 
-OneWire  ds2(5);
+OneWire  ds2(2);
 DallasTemperature sensors2(&ds2);
 
 OneWire  ds3(3);
@@ -78,17 +67,22 @@ void setup() {
   sensors2.begin();
   sensors3.begin();
 
-  pinMode(7, OUTPUT);
+  pinMode(10, OUTPUT);
+  digitalWrite(10, HIGH);
+
+  pinMode(5, OUTPUT);
   pinMode(photoRes, INPUT);
 
   pinMode(analogIn, INPUT);
 
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-    Ethernet.begin(mac, ip, mydns, gateway, subnet);
-  } else {
+  //if (Ethernet.begin(mac) == 0) {
+  //  Serial.println("Failed to configure Ethernet using DHCP");
+    Ethernet.begin(mac, ip);
+  //} else {
     Serial.println(Ethernet.localIP());
-  }
+  //}
+  Serial.println("Accendo termosifoni");
+  digitalWrite(5, HIGH);
   delay(5000);
 }
 
@@ -99,10 +93,10 @@ int parseCmd() {
   if (cmd == "HEATERS") {
     if (param == "ON") {
       Serial.println("Accendo termosifoni");
-      digitalWrite(7, HIGH);
+      digitalWrite(5, HIGH);
     } else {
       Serial.println("Spengo termosifoni");
-      digitalWrite(7, LOW);
+      digitalWrite(5, LOW);
     }
   }
   return 0;
@@ -164,7 +158,10 @@ int parseClient() {
 
 void httpGet(char* key, float value, char* unit) {
   if (client.connect(server, 80)) {
-    Serial.println("Sending value...");
+    Serial.print("Sending value...");
+    Serial.print(key);
+    Serial.print(" ");
+    Serial.println(value);
     client.print("GET /emoncms/input/post.json?apikey=");
     client.print(apikey);
     client.print("&node=");
@@ -185,7 +182,8 @@ void httpGet(char* key, float value, char* unit) {
     client.stop();
   } else {
     // kf you didn't get a connection to the server:
-    Serial.println("connection failed");
+    Serial.print("connection failed to ");
+    Serial.println(server);
   }
 }
 
@@ -207,8 +205,10 @@ void loop()
     currTime = millis();
   } while ((currTime - lastTime) <= 20);
   Current /= sqrt(2);
-  httpGet("CURRENT_CASA", Current, "A");
+  Serial.print("CURRENT_CASA: ");
   Serial.println(Current);
+  httpGet("CURRENT_CASA", Current, "A");
+
 
   DeviceAddress tmp_address;
   // GPIO 6
@@ -216,52 +216,67 @@ void loop()
   sensors.requestTemperatures();
   for (int i = 0; i < 3; i++) {
     if (i > 0) {
-      Serial.print(" ");
+      //Serial.print(" ");
     }
     float temp = sensors.getTempCByIndex(i);
+    
     if (temp >= -5 && temp <= 45) {
+      Serial.print("TEMP_SOTTOTETTO: ");
+      Serial.println(temp);
       httpGet("TEMP_SOTTOTETTO", temp, "&deg;");
       sensors.getAddress(tmp_address, i);
-      printAddress(tmp_address);
-      Serial.println(temp);
+      //printAddress(tmp_address);
+      //Serial.println(temp);
+      //Serial.print("sending value ");
       delay(1000);
+    }else{
+      //Serial.print("discarding value ");
     }
+    
   }
-  Serial.println();
-
   // GPIO 5
   numberOfDevices = sensors2.getDeviceCount();
   sensors2.requestTemperatures();
   for (int i = 0; i < 3; i++) {
     if (i > 0) {
-      Serial.print(" ");
+      //Serial.print(" ");
     }
     float temp = sensors2.getTempCByIndex(i);
+    
     if (temp >= -5 && temp <= 45) {
+      Serial.print("TEMP_DISIMPEGNO: ");
+      Serial.println(temp);
       httpGet("TEMP_DISIMPEGNO", temp, "&deg;");
       sensors2.getAddress(tmp_address, i);
-      printAddress(tmp_address);
-      Serial.println(temp);
+      //printAddress(tmp_address);
+      //Serial.print("sending value ");
       delay(1000);
+    }else{
+      //Serial.print("discarding value ");
     }
+    
   }
-  Serial.println();
-
   // GPIO 3
   numberOfDevices = sensors3.getDeviceCount();
   sensors3.requestTemperatures();
   for (int i = 0; i < 3; i++) {
     if (i > 0) {
-      Serial.print(" ");
+      //Serial.print(" ");
     }
     float temp = sensors3.getTempCByIndex(i);
+    
     if (temp >= -5 && temp <= 45) {
+      Serial.print("TEMP_SALOTTO: ");
+      Serial.println(temp);
       httpGet("TEMP_SALOTTO", temp, "&deg;");
       sensors3.getAddress(tmp_address, i);
-      printAddress(tmp_address);
-      Serial.println(temp);
+      //printAddress(tmp_address);
+      //Serial.print("sending value ");
       delay(1000);
+    }else{
+      //Serial.print("discarding value ");
     }
+    
   }
   Serial.println();
 /*
@@ -274,7 +289,7 @@ void loop()
 
   if (client.connect(serverCmd, 80)) {
     client.println("GET /temp/jobs.php?req_cmd=HEATERS&simple_out=1 HTTP/1.1");
-    client.println("Host: 192.168.1.3:80");
+    client.println("Host: 192.168.1.12:80");
     client.println("Authorization: Basic YW50bzpyZXNpc3RvcmU=");
     client.println("Connection: close");
     client.println();
@@ -295,7 +310,7 @@ void loop()
           client.print("GET /temp/jobs.php?job_id=");
           client.print(id);
           client.println(" HTTP/1.1");
-          client.println("Host: 192.168.1.3:80");
+          client.println("Host: 192.168.1.12:80");
           client.println("Authorization: Basic YW50bzpyZXNpc3RvcmU=");
           client.println("Connection: close");
           client.println();
