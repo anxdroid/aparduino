@@ -194,7 +194,7 @@ void loop()
         cmd += recvData.charAt(i);
       }else if (recvData.charAt(i) == ':' && nToken == 1) {
         nToken++;
-      }else if (nToken == 2) {
+      }else if (recvData.charAt(i) != '\r' && recvData.charAt(i) != '\n' nToken == 2) {
         param += recvData.charAt(i);
       }
     }    
