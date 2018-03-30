@@ -69,22 +69,6 @@ void setup() {
   delay(5000);
 }
 
-
-int parseCmd() {
-  Serial.println(cmd);
-  Serial.println(param);
-  if (cmd == "HEATERS") {
-    if (param == "ON") {
-      Serial.println("Accendo termosifoni");
-      digitalWrite(5, HIGH);
-    } else {
-      Serial.println("Spengo termosifoni");
-      digitalWrite(5, LOW);
-    }
-  }
-  return 0;
-}
-
 void loop()
 {
   // ***************** Consumo corrente
@@ -169,7 +153,7 @@ void loop()
   Serial.println("0:GET_CMD:0:X");
   Serial.flush();
   //while (Serial.available() == 0);
-  id = "0";
+  id = "";
   cmd = "";
   param = "";
   String tmpToken = "";
@@ -207,9 +191,10 @@ void loop()
     Serial.print(cmd);
     Serial.print(" param: ");
     Serial.println(param);
-    Serial.flush();
-
-    parseCmd();
+    if (cmd != "") {
+      parseCmd();
+      Serial.flush();
+    }
   }
   
   /*
@@ -245,5 +230,20 @@ void loop()
   }
   */
   //delay(2000);
+}
+
+int parseCmd() {
+  //Serial.println(cmd);
+  //Serial.println(param);
+  if (cmd == "HEATERS") {
+    if (param == "ON") {
+      Serial.println("Accendo termosifoni");
+      digitalWrite(5, HIGH);
+    } else {
+      Serial.println("Spengo termosifoni");
+      digitalWrite(5, LOW);
+    }
+  }
+  return 0;
 }
 
