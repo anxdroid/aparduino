@@ -74,10 +74,10 @@ int parseCmd() {
   //Serial.println(param);
   if (cmd == "HEATERS") {
     if (param == "ON") {
-      Serial.println("Accendo termosifoni");
+      //Serial.println("Accendo termosifoni");
       digitalWrite(5, HIGH);
     } else {
-      Serial.println("Spengo termosifoni");
+      //Serial.println("Spengo termosifoni");
       digitalWrite(5, LOW);
     }
   }
