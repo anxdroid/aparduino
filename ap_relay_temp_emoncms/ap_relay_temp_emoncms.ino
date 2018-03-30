@@ -167,7 +167,8 @@ void loop()
 */
 
   // ***************** Richiesta di comandi
-  Serial.flush();
+  delay(500);
+  //Serial.flush();
   Serial.println("0:GET_CMD:0:X");
   Serial.flush();
   //while (Serial.available() == 0);
