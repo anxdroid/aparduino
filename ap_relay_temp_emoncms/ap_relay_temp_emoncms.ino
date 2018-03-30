@@ -69,19 +69,22 @@ void setup() {
   delay(5000);
 }
 
-int parseCmd() {
+String parseCmd() {
   //Serial.println(cmd);
   //Serial.println(param);
+  String returnVal;
   if (cmd == "HEATERS") {
     if (param == "ON") {
       //Serial.println("Accendo termosifoni");
+      returnVal = "ON";
       digitalWrite(5, HIGH);
     } else {
       //Serial.println("Spengo termosifoni");
+      returnVal = "OFF";
       digitalWrite(5, LOW);
     }
   }
-  return 0;
+  return returnVal;
 }
 
 void loop()
@@ -204,8 +207,10 @@ void loop()
     Serial.println(param);
     */
     if (cmd != "") {
-      parseCmd();
-      Serial.println(id);
+      String returnVal = parseCmd();
+      Serial.print(id);
+      Serial.print(":");
+      Serial.println(returnVal);
       Serial.flush();
     }
   }
