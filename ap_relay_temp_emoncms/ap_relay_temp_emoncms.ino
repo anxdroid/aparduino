@@ -199,7 +199,7 @@ void loop()
       }
     }
 
-    parseCmd();
+    
     
     //Serial.println(recvData);
     Serial.print(id);
@@ -208,6 +208,8 @@ void loop()
     Serial.print(" param: ");
     Serial.println(param);
     Serial.flush();
+
+    parseCmd();
   }
   
   /*
