@@ -195,14 +195,17 @@ void loop()
         param += recvData.charAt(i);
       }
     }    
-    //Serial.println(recvData);
+    /*
+    Serial.println(recvData);
     Serial.print(id);
     Serial.print(") cmd: ");
     Serial.print(cmd);
     Serial.print(" param: ");
     Serial.println(param);
+    */
     if (cmd != "") {
       parseCmd();
+      Serial.println(id);
       Serial.flush();
     }
   }
