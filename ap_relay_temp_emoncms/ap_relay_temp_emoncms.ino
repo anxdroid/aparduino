@@ -69,6 +69,21 @@ void setup() {
   delay(5000);
 }
 
+int parseCmd() {
+  //Serial.println(cmd);
+  //Serial.println(param);
+  if (cmd == "HEATERS") {
+    if (param == "ON") {
+      Serial.println("Accendo termosifoni");
+      digitalWrite(5, HIGH);
+    } else {
+      Serial.println("Spengo termosifoni");
+      digitalWrite(5, LOW);
+    }
+  }
+  return 0;
+}
+
 void loop()
 {
   // ***************** Consumo corrente
@@ -159,7 +174,6 @@ void loop()
   String tmpToken = "";
   String recvData = "";
   int nToken = 0;
-  boolean done = false;
   while (Serial.available() == 0);
 
   if (Serial.available() > 0) {
@@ -167,7 +181,6 @@ void loop()
   }
 
   if (recvData != "") {
-    boolean foundSpace = false;
     for (int i = 0; i < recvData.length(); i++) {
       
       if (recvData.charAt(i) != ' ' && nToken == 0) {
@@ -181,10 +194,7 @@ void loop()
       }else if (nToken == 2) {
         param += recvData.charAt(i);
       }
-    }
-
-    
-    
+    }    
     //Serial.println(recvData);
     Serial.print(id);
     Serial.print(") cmd: ");
@@ -196,54 +206,6 @@ void loop()
       Serial.flush();
     }
   }
-  
-  /*
-  if (client.connect(serverCmd, 80)) {
-    client.println("GET /temp/jobs.php?req_cmd=HEATERS&simple_out=1 HTTP/1.1");
-    client.println("Host: 192.168.1.12:80");
-    client.println("Authorization: Basic YW50bzpyZXNpc3RvcmU=");
-    client.println("Connection: close");
-    client.println();
-    int retval = parseClient();
-    client.stop();
-    if (retval == 0) {
-      int retcmd = parseCmd();
-      if (retcmd == 0) {
-        //Serial.print("connecting...");
-        if (client.connect(serverCmd, 80)) {
-          //Serial.println("connected");
-          client.print("GET /temp/jobs.php?job_id=");
-          client.print(id);
-          client.println(" HTTP/1.1");
-          client.println("Host: 192.168.1.12:80");
-          client.println("Authorization: Basic YW50bzpyZXNpc3RvcmU=");
-          client.println("Connection: close");
-          client.println();
-          client.stop();
-        }
-      }
-      prev_id = id;
-      prev_cmd = cmd;
-      prev_param = param;
-      id = cmd = param = "";
-    }
-  }
-  */
   //delay(2000);
-}
-
-int parseCmd() {
-  //Serial.println(cmd);
-  //Serial.println(param);
-  if (cmd == "HEATERS") {
-    if (param == "ON") {
-      Serial.println("Accendo termosifoni");
-      digitalWrite(5, HIGH);
-    } else {
-      Serial.println("Spengo termosifoni");
-      digitalWrite(5, LOW);
-    }
-  }
-  return 0;
 }
 
