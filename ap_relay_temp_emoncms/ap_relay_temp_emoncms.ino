@@ -20,7 +20,7 @@ DallasTemperature sensor2(&ds2);
 OneWire  ds3(3);
 DallasTemperature sensor3(&ds3);
 const int photoRes = A0;
-
+const int heaters = 8;
 const int analogIn = A4;
 int mVperAmp = 66; // use 100 for 20A Module and 66 for 30A Module
 int RawValue = 0;
@@ -56,16 +56,16 @@ void setup() {
   sensor2.begin();
   sensor3.begin();
 
-  pinMode(10, OUTPUT);
-  digitalWrite(10, HIGH);
+  //pinMode(10, OUTPUT);
+  //digitalWrite(10, HIGH);
   
   pinMode(photoRes, INPUT);
 
   pinMode(analogIn, INPUT);
 
   Serial.println("Accendo termosifoni");
-  pinMode(5, OUTPUT);
-  digitalWrite(5, HIGH);
+  pinMode(heaters, OUTPUT);
+  digitalWrite(heaters, HIGH);
   delay(5000);
 }
 
@@ -77,11 +77,11 @@ String parseCmd() {
     if (param == "ON") {
       //Serial.println("Accendo termosifoni");
       returnVal = "ON";
-      digitalWrite(5, HIGH);
+      digitalWrite(heaters, HIGH);
     } else {
       //Serial.println("Spengo termosifoni");
       returnVal = "OFF";
-      digitalWrite(5, LOW);
+      digitalWrite(heaters, LOW);
     }
   }
   return returnVal;
