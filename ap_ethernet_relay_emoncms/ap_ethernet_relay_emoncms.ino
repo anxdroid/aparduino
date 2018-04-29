@@ -81,8 +81,8 @@ void setup() {
   //} else {
     Serial.println(Ethernet.localIP());
   //}
-  Serial.println("Accendo termosifoni");
-  digitalWrite(5, HIGH);
+  //Serial.println("Accendo termosifoni");
+  //digitalWrite(5, HIGH);
   delay(5000);
 }
 
