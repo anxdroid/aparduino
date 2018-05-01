@@ -63,9 +63,9 @@ void setup() {
 
   pinMode(analogIn, INPUT);
 
-  Serial.println("Accendo termosifoni");
+  //Serial.println("Accendo termosifoni");
   pinMode(heaters, OUTPUT);
-  digitalWrite(heaters, HIGH);
+  //digitalWrite(heaters, HIGH);
   delay(5000);
 }
 
